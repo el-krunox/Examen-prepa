@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Examen Ingreso</title>
+<style>
+body {font-family: Arial; background:#0f172a; color:white; text-align:center;}
+.container {max-width:900px;margin:auto;}
+.question {background:#1e293b;padding:12px;margin:10px;border-radius:8px;}
+button {padding:8px;width:100%;margin:4px;border:none;border-radius:4px;font-size:15px;}
+.correct {background:#22c55e;color:black;}
+.incorrect {background:#ef4444;color:white;}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>📘 Examen de Práctica</h1>
+<div id="quiz"></div>
+<button onclick="finishExam()">Finalizar</button>
+<div id="result"></div>
+</div>
+
+<script>
+const questions = [
+ {q:"¿Cuánto es 12 + 18?",o:["20","30","28","32"],a:1},
+ {q:"¿Cuánto es 9 × 7?",o:["56","63","72","49"],a:1},
+ {q:"¿Raíz cuadrada de 81?",o:["7","8","9","6"],a:2},
+ {q:"¿Quién inició la Independencia de México?",o:["Juárez","Hidalgo","Iturbide","Díaz"],a:1},
+ {q:"Capital de México:",o:["Monterrey","Guadalajara","CDMX","Toluca"],a:2},
+ {q:"Órgano que bombea sangre:",o:["Pulmón","Cerebro","Corazón","Riñón"],a:2},
+ {q:"Sinónimo de feliz:",o:["Triste","Contento","Enojado","Serio"],a:1},
+ {q:"Valor de decir la verdad:",o:["Respeto","Honestidad","Orgullo","Fuerza"],a:1},
+ 
+// ===== HISTORIA =====
+ {q:"¿En qué año inició la Independencia de México?",o:["1800","1810","1821","1910"],a:1},
+ {q:"¿Quién dio el Grito de Dolores?",o:["Benito Juárez","Miguel Hidalgo","Morelos","Iturbide"],a:1},
+ {q:"¿Quién fue el primer presidente de México?",o:["Guadalupe Victoria","Porfirio Díaz","Santa Anna","Juárez"],a:0},
+ {q:"¿Qué documento proclamó la Independencia de México?",o:["Plan de Ayala","Acta de Independencia","Constitución de 1857","Tratado de Córdoba"],a:1},
+ {q:"¿Qué guerra permitió a México consolidar su independencia?",o:["Guerra de Reforma","Guerra de Independencia","Revolución Mexicana","Guerra Cristera"],a:1},
+ {q:"¿Quién escribió los Sentimientos de la Nación?",o:["Hidalgo","Iturbide","Morelos","Guerrero"],a:2},
+ {q:"¿En qué año ocurrió la Revolución Mexicana?",o:["1810","1910","1920","1857"],a:1},
+ {q:"¿Quién fue presidente durante gran parte del Porfiriato?",o:["Madero","Juárez","Porfirio Díaz","Carranza"],a:2},
+ {q:"¿Qué buscaba principalmente la Revolución Mexicana?",o:["Eliminar la monarquía","Justicia social","Conquistar territorios","Expandir comercio"],a:1},
+ {q:"¿Qué presidente impulsó la expropiación petrolera?",o:["Cárdenas","Ávila Camacho","Obregón","Díaz Ordaz"],a:0},
+ 
+ {q:"¿Dónde surgió la civilización egipcia?",o:["Mesopotamia","Río Nilo","Río Tigris","Valle del Indo"],a:1},
+ {q:"¿Qué inventaron los fenicios?",o:["La brújula","El papel","El alfabeto","La pólvora"],a:2},
+ {q:"¿Quién fue el primer emperador romano?",o:["Julio César","Augusto","Nerón","Trajano"],a:1},
+ {q:"¿Qué imperio construyó Machu Picchu?",o:["Azteca","Maya","Inca","Olmeca"],a:2},
+ {q:"¿Quién descubrió América en 1492?",o:["Hernán Cortés","Magallanes","Cristóbal Colón","Pizarro"],a:2},
+ {q:"¿Qué movimiento buscaba libertad, igualdad y fraternidad?",o:["Revolución Industrial","Renacimiento","Revolución Francesa","Guerra Fría"],a:2},
+ {q:"¿Qué conflicto mundial ocurrió entre 1914 y 1918?",o:["Segunda Guerra Mundial","Primera Guerra Mundial","Guerra Fría","Guerra de Corea"],a:1},
+ {q:"¿Qué país lanzó la bomba atómica en 1945?",o:["Alemania","Japón","Estados Unidos","Rusia"],a:2},
+ {q:"¿Qué muro cayó en 1989?",o:["Muro de Roma","Muro de Berlín","Muro de China","Muro de París"],a:1},
+ {q:"¿Qué civilización construyó las pirámides de Teotihuacán?",o:["Azteca","Maya","Teotihuacana","Tolteca"],a:2},
+ 
+// ========= MATEMÁTICAS =========
+ {q:"¿Cuánto es 25 + 37?",o:["52","62","72","60"],a:1},
+ {q:"¿Cuánto es 9 × 8?",o:["64","72","81","69"],a:1},
+ {q:"¿Cuánto es 144 ÷ 12?",o:["10","11","12","14"],a:2},
+ {q:"¿Cuál es el 20% de 150?",o:["20","25","30","35"],a:2},
+ {q:"¿Cuánto es 3²?",o:["6","9","12","3"],a:1},
+ {q:"Si un lápiz cuesta , ¿cuánto cuestan 6?",o:["20","25","30","35"],a:2},
+ {q:"¿Cuánto es 1/2 + 1/4?",o:["3/4","1/6","2/4","1/8"],a:0},
+ {q:"¿Cuál es el resultado de 5 × (4 + 2)?",o:["20","30","24","26"],a:1},
+ {q:"¿Cuánto es la raíz cuadrada de 81?",o:["7","8","9","6"],a:2},
+ {q:"¿Cuánto es 100 - 45?",o:["45","55","65","50"],a:1},
+ 
+ // ========= ESPAÑOL =========
+ {q:"¿Cuál es un sustantivo?",o:["Correr","Mesa","Rápido","Bonito"],a:1},
+ {q:"¿Qué signo se usa para preguntar?",o:["¡!","...","¿?",";"],a:2},
+ {q:"¿Cuál es un verbo?",o:["Casa","Brincar","Azul","Mesa"],a:1},
+ {q:"¿Qué es un adjetivo?",o:["Describe un sustantivo","Acción","Lugar","Nombre propio"],a:0},
+ {q:"¿Cuál palabra está correctamente acentuada?",o:["Arbol","Café","Lapiz","Joven"],a:1},
+ {q:"¿Qué es un sinónimo?",o:["Palabra opuesta","Palabra similar","Número","Objeto"],a:1},
+ {q:"¿Cuál es un ejemplo de oración?",o:["Perro","Corre rápido","Azul","Mesa grande"],a:1},
+ {q:"¿Qué signo indica exclamación?",o:["¿?","!","...",";"],a:1},
+ {q:"¿Qué es un texto narrativo?",o:["Da instrucciones","Cuenta una historia","Explica un tema","Enumera datos"],a:1},
+ {q:"¿Cuál es un antónimo de “alto”?",o:["Grande","Bajo","Fuerte","Largo"],a:1},
+ 
+ // ========= HISTORIA =========
+ {q:"¿En qué año inició la Independencia de México?",o:["1800","1810","1821","1910"],a:1},
+ {q:"¿Quién dio el Grito de Dolores?",o:["Hidalgo","Juárez","Morelos","Iturbide"],a:0},
+ {q:"¿Qué movimiento inició en 1910?",o:["Reforma","Independencia","Revolución Mexicana","Porfiriato"],a:2},
+ {q:"¿Quién fue Benito Juárez?",o:["Presidente","Conquistador","Rey","General español"],a:0},
+ {q:"¿Qué civilización construyó las pirámides de Egipto?",o:["Romanos","Mayas","Egipcios","Griegos"],a:2},
+ {q:"¿Quién descubrió América?",o:["Colón","Cortés","Magallanes","Pizarro"],a:0},
+ {q:"¿Qué imperio construyó Machu Picchu?",o:["Inca","Azteca","Maya","Olmeca"],a:0},
+ {q:"¿Qué guerra fue de 1914 a 1918?",o:["Primera Guerra Mundial","Segunda Guerra Mundial","Guerra Fría","Revolución"],a:0},
+ {q:"¿Qué documento dio fin al Porfiriato?",o:["Plan de Ayala","Plan de San Luis","Constitución","Tratado"],a:1},
+ {q:"¿Qué presidente expropió el petróleo?",o:["Cárdenas","Díaz","Fox","Obregón"],a:0},
+ 
+ // ========= GEOGRAFÍA =========
+ {q:"¿Cuál es el río más largo del mundo?",o:["Amazonas","Nilo","Bravo","Yangtsé"],a:0},
+ {q:"¿Cuál es el continente más grande?",o:["Europa","Asia","África","América"],a:1},
+ {q:"¿México está en qué continente?",o:["Asia","Europa","América","Oceanía"],a:2},
+ {q:"¿Cuál es la capital de México?",o:["Monterrey","Guadalajara","CDMX","Puebla"],a:2},
+ {q:"¿Qué océano está al oeste de México?",o:["Atlántico","Índico","Pacífico","Ártico"],a:2},
+ {q:"¿Qué línea divide la Tierra en hemisferios norte y sur?",o:["Meridiano","Ecuador","Trópico","Polo"],a:1},
+ {q:"¿Qué país tiene forma de bota?",o:["España","Italia","Brasil","Chile"],a:1},
+ {q:"¿Cuál es el desierto más grande del mundo?",o:["Sahara","Sonora","Gobi","Kalahari"],a:0},
+ {q:"¿Cuántos continentes hay?",o:["5","6","7","8"],a:2},
+ {q:"¿Qué estado está al norte de Nuevo León?",o:["Tamaulipas","Coahuila","Veracruz","Durango"],a:1},
+ 
+ // ========= CIENCIAS =========
+ {q:"¿Qué órgano bombea la sangre?",o:["Pulmón","Cerebro","Corazón","Riñón"],a:2},
+ {q:"¿Qué planeta es el más cercano al sol?",o:["Venus","Marte","Mercurio","Tierra"],a:2},
+ {q:"¿Qué necesitan las plantas para hacer fotosíntesis?",o:["Luz","Sonido","Calor","Metal"],a:0},
+ {q:"¿Qué estado del agua es el hielo?",o:["Líquido","Gaseoso","Sólido","Plasma"],a:2},
+ {q:"¿Qué gas respiramos?",o:["Oxígeno","Hidrógeno","Nitrógeno","Helio"],a:0},
+ {q:"¿Qué hueso protege el cerebro?",o:["Costilla","Cráneo","Fémur","Columna"],a:1},
+ {q:"¿Cuál es el órgano de la visión?",o:["Nariz","Ojo","Oído","Lengua"],a:1},
+ {q:"¿Qué fuerza nos mantiene en el suelo?",o:["Magnetismo","Electricidad","Gravedad","Viento"],a:2},
+ {q:"¿Cuál es el planeta rojo?",o:["Júpiter","Marte","Venus","Saturno"],a:1},
+ {q:"¿Qué aparato mide la temperatura?",o:["Barómetro","Termómetro","Velocímetro","Microscopio"],a:1},
+ 
+ // ========= FORMACIÓN CÍVICA =========
+ {q:"¿Qué es el respeto?",o:["Ignorar","Valorar a los demás","Mandar","Pelear"],a:1},
+ {q:"¿Qué es un derecho?",o:["Obligación","Beneficio garantizado","Castigo","Regla"],a:1},
+ {q:"¿Quién hace las leyes?",o:["Presidente","Ciudadanos","Congreso","Escuela"],a:2},
+ {q:"¿Qué es la democracia?",o:["Gobierno del pueblo","Dictadura","Monarquía","Anarquía"],a:0},
+ {q:"¿Qué valor fomenta ayudar a otros?",o:["Egoísmo","Solidaridad","Enojo","Miedo"],a:1},
+ {q:"¿Qué significa igualdad?",o:["Ser mejores","Mismos derechos","Mandar","Competir"],a:1},
+ {q:"¿Qué es una responsabilidad?",o:["Derecho","Obligación","Juego","Premio"],a:1},
+ {q:"¿Qué promueve la honestidad?",o:["Mentir","Decir la verdad","Robar","Ocultar"],a:1},
+ {q:"¿Qué institución protege los derechos humanos?",o:["ONU","FIFA","SEP","NASA"],a:0},
+ {q:"¿Qué es la tolerancia?",o:["Rechazar","Aceptar diferencias","Pelear","Ignorar"],a:1},
+// ========= MATEMÁTICAS EXTRA =========
+  {q:"¿Cuánto es 7 × 12?",o:["72","84","96","64"],a:1},
+  {q:"¿Cuánto es 360 ÷ 6?",o:["30","40","50","60"],a:3},
+  {q:"¿Qué número falta? 2, 4, 6, __",o:["7","8","10","12"],a:1},
+  {q:"Área de un cuadrado de lado 5:",o:["10","20","25","30"],a:2},
+  {q:"Perímetro de un triángulo de lados 3,4,5:",o:["10","11","12","13"],a:2},
+  {q:"¿Cuánto es 15% de 200?",o:["20","25","30","35"],a:2},
+  {q:"¿Cuánto es 9²?",o:["18","81","27","99"],a:1},
+  {q:"¿Resultado de (10+5)×2?",o:["20","25","30","40"],a:2},
+  {q:"¿Cuántos minutos hay en 2 horas?",o:["60","90","120","150"],a:2},
+  {q:"¿Cuánto es 1/3 de 90?",o:["20","25","30","40"],a:2},
+  
+  // ========= ESPAÑOL EXTRA =========
+  {q:"¿Qué es un pronombre?",o:["Nombre","Sustituye al sustantivo","Acción","Describe"],a:1},
+  {q:"¿Cuál es un adverbio?",o:["Rápidamente","Casa","Azul","Correr"],a:0},
+  {q:"¿Qué palabra lleva mayúscula?",o:["lunes","méxico","Juan","perro"],a:2},
+  {q:"¿Qué es una sílaba?",o:["Una letra","Sonido al pronunciar","Una palabra","Un número"],a:1},
+  {q:"¿Qué tipo de texto da instrucciones?",o:["Narrativo","Descriptivo","Instructivo","Poético"],a:2},
+  {q:"¿Qué palabra es aguda?",o:["Café","Árbol","Pájaro","Teléfono"],a:0},
+  {q:"¿Cuál es un sustantivo propio?",o:["ciudad","río","México","perro"],a:2},
+  {q:"¿Qué signo separa ideas en una oración?",o:["Punto","Coma","Dos puntos","Guion"],a:1},
+  {q:"¿Qué es un cuento?",o:["Texto científico","Historia corta","Noticia","Instrucción"],a:1},
+  {q:"¿Antónimo de rápido?",o:["Ligero","Lento","Fuerte","Alto"],a:1},
+  
+  // ========= HISTORIA EXTRA =========
+  {q:"¿Qué cultura inventó el papel?",o:["Egipcia","China","Romana","Griega"],a:1},
+  {q:"¿Quién fue el primer emperador romano?",o:["Julio César","Augusto","Nerón","Marco Aurelio"],a:1},
+  {q:"¿Qué país lanzó la primera bomba atómica?",o:["Alemania","EEUU","Japón","Rusia"],a:1},
+  {q:"¿Qué civilización creó el calendario azteca?",o:["Maya","Azteca","Inca","Olmeca"],a:1},
+  {q:"¿Quién encabezó la conquista de México?",o:["Colón","Cortés","Pizarro","Magallanes"],a:1},
+  {q:"¿Qué hecho marcó el inicio de la Edad Media?",o:["Caída de Roma","Descubrimiento de América","Revolución","Independencia"],a:0},
+  {q:"¿Qué presidente promulgó la Constitución de 1917?",o:["Carranza","Madero","Obregón","Díaz"],a:0},
+  {q:"¿Dónde surgieron los Juegos Olímpicos?",o:["Roma","Grecia","Egipto","China"],a:1},
+  {q:"¿Qué imperio construyó el Coliseo?",o:["Griego","Romano","Egipcio","Persa"],a:1},
+  {q:"¿Qué tratado puso fin a la Primera Guerra Mundial?",o:["Versalles","Tordesillas","París","Roma"],a:0},
+  
+  // ========= GEOGRAFÍA EXTRA =========
+  {q:"¿País más grande del mundo?",o:["China","EEUU","Rusia","Canadá"],a:2},
+  {q:"¿Capital de Francia?",o:["Roma","Madrid","París","Londres"],a:2},
+  {q:"¿Qué océano es el más pequeño?",o:["Pacífico","Atlántico","Índico","Ártico"],a:3},
+  {q:"¿Cuál es la montaña más alta?",o:["Everest","Popocatépetl","K2","Alpes"],a:0},
+  {q:"¿Dónde se ubica Japón?",o:["Europa","América","Asia","África"],a:2},
+  {q:"¿Qué país tiene más población?",o:["India","China","EEUU","Rusia"],a:1},
+  {q:"¿Qué mar separa Europa de África?",o:["Rojo","Mediterráneo","Negro","Báltico"],a:1},
+  {q:"¿Qué clima tiene la selva?",o:["Seco","Húmedo","Frío","Desértico"],a:1},
+  {q:"¿Qué estado tiene playa?",o:["Nuevo León","Zacatecas","Veracruz","Coahuila"],a:2},
+  {q:"¿Qué tipo de mapa muestra montañas?",o:["Político","Físico","Climático","Urbano"],a:1},
+  
+  // ========= CIENCIAS EXTRA =========
+  {q:"¿Qué órgano filtra la sangre?",o:["Pulmón","Riñón","Corazón","Estómago"],a:1},
+  {q:"¿Qué vitamina produce el sol?",o:["A","B","C","D"],a:3},
+  {q:"¿Qué aparato mide la presión?",o:["Termómetro","Barómetro","Micrófono","Balanza"],a:1},
+  {q:"¿Qué animal es mamífero?",o:["Tiburón","Ballena","Tortuga","Gallina"],a:1},
+  {q:"¿Qué parte de la planta absorbe agua?",o:["Hoja","Tallo","Raíz","Flor"],a:2},
+  {q:"¿Qué sentido detecta sabores?",o:["Vista","Oído","Olfato","Gusto"],a:3},
+  {q:"¿Qué material conduce electricidad?",o:["Plástico","Madera","Cobre","Vidrio"],a:2},
+  {q:"¿Qué gas usan las plantas?",o:["Oxígeno","Hidrógeno","CO₂","Helio"],a:2},
+  {q:"¿Qué astro da luz a la Tierra?",o:["Luna","Estrella","Sol","Planeta"],a:2},
+  {q:"¿Qué parte protege al corazón?",o:["Costillas","Pulmones","Piel","Hígado"],a:0},
+  
+  // ========= FORMACIÓN CÍVICA EXTRA =========
+  {q:"¿Qué es una ley?",o:["Juego","Regla obligatoria","Premio","Sugerencia"],a:1},
+  {q:"¿Qué valor fomenta la paz?",o:["Violencia","Respeto","Odio","Egoísmo"],a:1},
+  {q:"¿Qué es votar?",o:["Opinar","Elegir autoridades","Castigar","Mandar"],a:1},
+  {q:"¿Qué es la libertad?",o:["Hacer daño","Elegir con responsabilidad","Mandar","Ignorar"],a:1},
+  {q:"¿Qué es una obligación?",o:["Derecho","Deber","Juego","Permiso"],a:1},
+  {q:"¿Qué institución gobierna un municipio?",o:["Presidente","Congreso","Ayuntamiento","Escuela"],a:2},
+  {q:"¿Qué es la participación ciudadana?",o:["Ignorar","Involucrarse","Pelear","Robar"],a:1},
+  {q:"¿Qué promueve la igualdad?",o:["Discriminación","Justicia","Violencia","Egoísmo"],a:1},
+  {q:"¿Qué es el diálogo?",o:["Pelear","Hablar para resolver","Gritar","Ignorar"],a:1},
+  {q:"¿Qué es la responsabilidad social?",o:["Pensar solo en mí","Ayudar a la comunidad","Ganar dinero","Viajar"],a:1},
+];
+
+let score = 0;
+let answered = Array(questions.length).fill(false);
+
+function loadQuiz(){
+ const quiz = document.getElementById("quiz");
+
+ questions.forEach((q, i) => {
+   const box = document.createElement("div");
+   box.className = "question";
+
+   const title = document.createElement("h4");
+   title.textContent = (i+1) + ". " + q.q;
+   box.appendChild(title);
+
+   q.o.forEach((opt, j) => {
+     const btn = document.createElement("button");
+     btn.textContent = opt;
+     btn.onclick = function(){
+       checkAnswer(btn, q.a, j, i);
+     };
+     box.appendChild(btn);
+   });
+
+   quiz.appendChild(box);
+ });
+}
+
+function checkAnswer(btn, correct, selected, index){
+ if(answered[index]) return;
+ answered[index] = true;
+
+ if(selected === correct){
+   btn.classList.add("correct");
+   score++;
+ } else {
+   btn.classList.add("incorrect");
+ }
+}
+
+function finishExam(){
+ let percent = (score / questions.length) * 100;
+ document.getElementById("result").innerHTML =
+   "Aciertos: " + score + "/" + questions.length + "<br>" +
+   "Calificación: " + percent.toFixed(1) + "%<br>" +
+   (percent >= 70 ? "✅ PASÓ" : "❌ NO PASÓ");
+}
+
+loadQuiz();
+</script>
+</body>
+</html>
